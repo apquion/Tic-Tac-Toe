@@ -1,0 +1,156 @@
+[1mdiff --git a/index.js b/index2.js[m
+[1mindex 86c8836..832f7bb 100644[m
+[1m--- a/index.js[m
+[1m+++ b/index2.js[m
+[36m@@ -2,27 +2,27 @@[m [mimport React from 'react'[m
+ import ReactDOM from 'react-dom'[m
+ import './index.css'[m
+ [m
+[31m-function Square(props){[m
+[31m-  return(<button className="square" onClick={props.onClick}>[m
+[31m-          {props.value}[m
+[31m-          </button>);[m
+[31m-}[m
+[31m-[m
+[31m-[m
+[31m-  class Board extends React.Component {    [m
+[31m-    /*Board is passed squares as slice */[m
+[32m+[m[32mfunction Square(props) {[m
+[32m+[m[32m    return ([m
+[32m+[m[32m      <button className="square" onClick={props.onClick}>[m
+[32m+[m[32m        {props.value}[m
+[32m+[m[32m      </button>[m
+[32m+[m[32m    );[m
+[32m+[m[32m  }[m
+[32m+[m[41m  [m
+[32m+[m[32m  class Board extends React.Component {[m
+     renderSquare(i) {[m
+[31m-      return (<Square [m
+[31m-              value={this.props.squares[i]}[m
+[31m-              onClick={() => this.props.onClick(i)}[m
+[31m-              />[m
+[32m+[m[32m      return ([m
+[32m+[m[32m        <Square[m
+[32m+[m[32m          value={this.props.squares[i]}[m
+[32m+[m[32m          onClick={() => this.props.onClick(i)}[m
+[32m+[m[32m        />[m
+       );[m
+     }[m
+   [m
+     render() {[m
+       return ([m
+         <div>[m
+[31m-          <div className="status"></div>[m
+           <div className="board-row">[m
+             {this.renderSquare(0)}[m
+             {this.renderSquare(1)}[m
+[36m@@ -43,78 +43,69 @@[m [mfunction Square(props){[m
+     }[m
+   }[m
+   [m
+[31m-[m
+[31m-  class Game extends React.Component{[m
+[31m-    constructor(props){[m
+[31m-      /* In Java, whenever making a constructor of a subclass you must call super(props) */[m
+[32m+[m[32m  class Game extends React.Component {[m
+[32m+[m[32m    constructor(props) {[m
+       super(props);[m
+       this.state = {[m
+[31m-        /* Setting two properties */[m
+         history: [{[m
+           squares: Array(9).fill(null)[m
+         }],[m
+         xIsNext: true[m
+       };[m
+     }[m
+[31m-[m
+[31m-    handleClick(i){[m
+[32m+[m[41m  [m
+[32m+[m[32m    handleClick(i) {[m
+       const history = this.state.history;[m
+[31m-      const current = history[history.length = 1];[m
+[32m+[m[32m      const current = history[history.length - 1];[m
+       const squares = current.squares.slice();[m
+[31m-      [m
+[31m-      /* Logical OR (expr 1 || expr 2) -- tries to evaluate expr1, if False returns expr2 */[m
+[31m-      if (calculateWinner(squares) || squares[i]){[m
+[32m+[m[32m      if (calculateWinner(squares) || squares[i]) {[m
+         return;[m
+       }[m
+[31m-      /* Ternary Operator - condition ? val1 : val2 */[m
+[31m-      /* Evaluates condition - if true returns val1, else val2*/[m
+       squares[i] = this.state.xIsNext ? 'X' : 'O';[m
+       this.setState({[m
+         history: history.concat([{[m
+[31m-          squares:squares,[m
+[32m+[m[32m          squares: squares[m
+         }]),[m
+         xIsNext: !this.state.xIsNext,[m
+       });[m
+     }[m
+[31m-[m
+[31m-    render(){[m
+[32m+[m[41m    [m
+[32m+[m[32m    render() {[m
+       const history = this.state.history;[m
+       const current = history[history.length - 1];[m
+       const winner = calculateWinner(current.squares);[m
+[31m-    [m
+[31m-      /* Variables declared with let have Block Scope [m
+[31m-         Block variables are only accessible within the Block*/[m
+[32m+[m[41m  [m
+       let status;[m
+[31m-      if (winner){[m
+[31m-        status = "Winner: " + winner ;[m
+[31m-      }  else{[m
+[31m-        status = "Next player:" + (this.state.xIsNext ? 'X' : 'O');[m
+[32m+[m[32m      if (winner) {[m
+[32m+[m[32m        status = 'Winner: ' + winner;[m
+[32m+[m[32m      } else {[m
+[32m+[m[32m        status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');[m
+       }[m
+[31m-[m
+[31m-      return([m
+[31m-      <div className="game">[m
+[31m-        <div className="game-board">[m
+[31m-          <Board [m
+[31m-            squares={current.squares}[m
+[31m-            onClick={(i) => this.handleClick(i)}[m
+[31m-          />[m
+[31m-        </div>[m
+[31m-        <div className="game-info">[m
+[31m-          <div>{status}</div>[m
+[31m-          <ol>{/*To Do*/}</ol>[m
+[32m+[m[41m  [m
+[32m+[m[32m      return ([m
+[32m+[m[32m        <div className="game">[m
+[32m+[m[32m          <div className="game-board">[m
+[32m+[m[32m            <Board[m
+[32m+[m[32m              squares={current.squares}[m
+[32m+[m[32m              onClick={(i) => this.handleClick(i)}[m
+[32m+[m[32m            />[m
+[32m+[m[32m          </div>[m
+[32m+[m[32m          <div className="game-info">[m
+[32m+[m[32m            <div>{status}</div>[m
+[32m+[m[32m            <ol>{/* TODO */}</ol>[m
+[32m+[m[32m          </div>[m
+         </div>[m
+[31m-      </div>);[m
+[31m-      }[m
+[31m- [m
+[32m+[m[32m      );[m
+     }[m
+[31m-[m
+[32m+[m[32m  }[m
+[32m+[m[41m  [m
+   // ========================================[m
+   [m
+   ReactDOM.render([m
+     <Game />,[m
+     document.getElementById('root')[m
+   );[m
+[31m-[m
+[32m+[m[41m  [m
+   function calculateWinner(squares) {[m
+     const lines = [[m
+       [0, 1, 2],[m
