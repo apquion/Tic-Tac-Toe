@@ -20,6 +20,7 @@ function Square(props) {
               />
       );
     }
+
     render() {
       return (
         <div>
@@ -50,21 +51,25 @@ function Square(props) {
       this.state = {
         /* Setting two properties */
         history: [{
-          squares: Array(9).fill(null)
+          squares: Array(9).fill(null),
+          coord: {x: null,y: null}
         }],
-        moveHistory: [{
-          moves: {x: null, y:null}
-        }],
+        moveHistory: [
+          {x: null, y:null}
+        ],
         stepNumber: 0,
         xIsNext: true,
-        lastMove: {x: null, y: null}
       };
     }
+
 
     handleClick(i) {
       const history = this.state.history;
       const current = history[history.length - 1];
       const squares = current.squares.slice();
+
+      const coord ={ x: (i % 3) + 1, y:(Math.ceil(i/3))}
+
       /* Logical OR (expr 1 || expr 2) -- tries to evaluate expr1, if False returns expr2 */
       if (calculateWinner(squares) || squares[i]){
         return;
@@ -72,17 +77,20 @@ function Square(props) {
       /* Ternary Operator - condition ? val1 : val2 */
       /* Evaluates condition - if true returns val1, else val2*/
       squares[i] = this.state.xIsNext ? "X" : "O";
+
       this.setState({
+
         history: history.concat([
           {
-          squares: squares
+          squares: squares,
+          coord: coord
         }
       ]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext, 
       /*todo: grab last move from x and y*/
-      lastMove: {x: (i % 3) + 1, y:(Math.ceil(i/3)) },
-      });
+    })
+
     }
 
     jumpTo(step){
@@ -97,24 +105,43 @@ function Square(props) {
       const history = this.state.history;
       const current = history[this.state.stepNumber];
       const winner = calculateWinner(current.squares);
-    
+
+      const buttonStyle = {
+        borderRadius: 5,
+        borderColor: '#c1eba0',
+        fontWeight: 'bold',
+      }
       /* Use the saved state of history and call the function on every element in the array*/
-      /* .map()
+      
           
-      /* Map creates array of applied */
+      /* .Map() creates array of applied */
       /* move is the index of the array, step is the squares */
       const moves = history.map((step, move) => {
       /* Const variables cannot be reassign */  
-      const coord = "(" + this.state.lastMove.x + "," +  this.state.lastMove.y + ")" 
+      const coordStr = "(" + history[move].coord.x + "," +  history[move].coord.y + ")" 
       const desc = move ?
-        ' Go to move #' + move + "Coordinates : " + coord:
+        ' Go to move #' + move + " : " + coordStr:
         ' Go to game start'
-        return(
-          <li key={move}>
-            <button onClick={() => this.jumpTo(move)}>{desc}
-            </button>
-          </li>
-        );
+
+      
+        /* === is strict equality (considers things of different type to be different) */ 
+        if (this.state.stepNumber === move){
+          /* The current step button is highlighted  */
+          return(
+            <li key={move}>
+              <button style={buttonStyle} onClick={() => this.jumpTo(move)}>{desc}
+              </button>
+            </li>
+          );
+        }
+        else{
+          return(
+            <li key={move}>
+              <button onClick={() => this.jumpTo(move)}>{desc}
+              </button>
+            </li>
+          );
+        }
       });
 
       /* Variables declared with let have Block Scope 
