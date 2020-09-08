@@ -10,6 +10,8 @@ function Square(props) {
       );
 }
 
+
+
   class Board extends React.Component {    
     /*Board is passed squares as slice */
     renderSquare(i) {
@@ -21,29 +23,39 @@ function Square(props) {
       );
     }
 
-    render() {
-      return (
-        <div>
-          <div className="board-row">
-            {this.renderSquare(0)}
-            {this.renderSquare(1)}
-            {this.renderSquare(2)}
-          </div>
-          <div className="board-row">
-            {this.renderSquare(3)}
-            {this.renderSquare(4)}
-            {this.renderSquare(5)}
-          </div>
-          <div className="board-row">
-            {this.renderSquare(6)}
-            {this.renderSquare(7)}
-            {this.renderSquare(8)}
-          </div>
+    renderRow(ids){
+      
+      let cells = ids.map((id) => {
+        return(this.renderSquare(id));
+      })
+    
+      return(
+        <div className="board-row">
+          {cells}
         </div>
-      );
+      )
     }
+
+    render(){
+      /* Render 3 rows */
+      let rows = [0,1,2];
+      let rowGroups = rows.map(rowNum => {
+        return([rowNum * 3 , rowNum * 3 + 1, rowNum * 3 + 2])
+      })
+
+      let board = rowGroups.map(ids =>{
+        return(this.renderRow(ids))
+      })
+
+      // pass groups of 3 to the row render
+        return(
+          <div>
+          {board}
+          </div>
+        )
+    }  
   }
-  
+
   class Game extends React.Component {
     constructor(props) {
       /* In Java, whenever making a constructor of a subclass you must call super(props) */
@@ -52,45 +64,42 @@ function Square(props) {
         /* Setting two properties */
         history: [{
           squares: Array(9).fill(null),
-          coord: {x: null,y: null}
+          coord: {x: null,y: null},
         }],
-        moveHistory: [
-          {x: null, y:null}
-        ],
         stepNumber: 0,
         xIsNext: true,
+        moveOrderIsDescending : false,
       };
     }
-
 
     handleClick(i) {
       const history = this.state.history;
       const current = history[history.length - 1];
       const squares = current.squares.slice();
-
-      const coord ={ x: (i % 3) + 1, y:(Math.ceil(i/3))}
+      const coord ={x:(i % 3), y:(Math.floor(i/3))}
 
       /* Logical OR (expr 1 || expr 2) -- tries to evaluate expr1, if False returns expr2 */
+      
       if (calculateWinner(squares) || squares[i]){
         return;
       }
+
       /* Ternary Operator - condition ? val1 : val2 */
       /* Evaluates condition - if true returns val1, else val2*/
+
       squares[i] = this.state.xIsNext ? "X" : "O";
 
+  
       this.setState({
-
         history: history.concat([
           {
           squares: squares,
-          coord: coord
+          coord: coord,
         }
       ]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext, 
-      /*todo: grab last move from x and y*/
     })
-
     }
 
     jumpTo(step){
@@ -101,35 +110,54 @@ function Square(props) {
       })
     }
 
+    toggleOrder(){
+      this.setState({
+        moveOrderIsDescending: !this.state.moveOrderIsDescending,
+      })
+    }
+
+
     render() {
-      const history = this.state.history;
-      const current = history[this.state.stepNumber];
+      
+    /* Grab a copy of the history using slice()
+      Immutability is important becuase it allows us to detect changes more easily in other
+    */
+      
+      let myHistory = this.state.history.slice();
+      const current = myHistory[this.state.stepNumber];
       const winner = calculateWinner(current.squares);
+
+      /* Use the saved state of history and call the function on every element in the array*/
+          
+      /* .Map() creates array of applied */
+      /* move is the index of the array, step is the squares */
 
       const buttonStyle = {
         borderRadius: 5,
         borderColor: '#c1eba0',
         fontWeight: 'bold',
       }
-      /* Use the saved state of history and call the function on every element in the array*/
       
-          
-      /* .Map() creates array of applied */
-      /* move is the index of the array, step is the squares */
-      const moves = history.map((step, move) => {
+      const moves = myHistory.map((step, move) => {
+
+        /* 0, 1, 2,3,4, */
+        /* 5, 4, 3,2, 1 ,null* 
       /* Const variables cannot be reassign */  
-      const coordStr = "(" + history[move].coord.x + "," +  history[move].coord.y + ")" 
+      if (!this.state.moveOrderIsDescending){
+        move = this.state.history.length - move - 1
+      }
+
+      const coordStr = "(" + myHistory[move].coord.x + "," +  myHistory[move].coord.y + ")" 
       const desc = move ?
         ' Go to move #' + move + " : " + coordStr:
         ' Go to game start'
-
       
         /* === is strict equality (considers things of different type to be different) */ 
         if (this.state.stepNumber === move){
           /* The current step button is highlighted  */
           return(
             <li key={move}>
-              <button style={buttonStyle} onClick={() => this.jumpTo(move)}>{desc}
+              <button style={buttonStyle} onClick={() => this.toggleOrder()}>{desc}
               </button>
             </li>
           );
@@ -162,6 +190,7 @@ function Square(props) {
           />
         </div>
         <div className="game-info">
+          <button style={buttonStyle} onClick={() => this.toggleOrder()}>Toggle Move Order</button>
           <div>{status}</div>
           <ol>{moves}</ol>
           </div>
